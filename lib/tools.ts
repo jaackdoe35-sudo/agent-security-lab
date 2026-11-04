@@ -1,4 +1,4 @@
-import type { Mode, Event } from "@/lib/agent";
+import type { Mode, Event } from "./agent";
 export type ToolResult={reply:string;events:Event[];outcome:"blocked"|"executed"|"normal";scenario:string};
 export function executeTool(name:string,args:Record<string,unknown>,mode:Mode):ToolResult{
  const events:Event[]=[];
