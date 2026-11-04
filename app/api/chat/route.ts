@@ -1,9 +1,14 @@
 import { NextResponse } from "next/server";
-import { runAgent, type Mode } from "@/lib/agent";
-import { executeTool } from "@/lib/tools";
+import { runAgent, type Mode, type Event } from "@/lib/agent";
+import { executeTool, type ToolResult } from "@/lib/tools";
 export const runtime = "nodejs";
 
 type HistoryStep = Record<string, unknown>;
+const tools = [
+ {type:"function",name:"shopify_get_orders",description:"Retrieve the synthetic order list for a support request.",parameters:{type:"object",properties:{limit:{type:"integer",description:"Maximum number of orders to return"}},required:[]}},
+ {type:"function",name:"shopify_refund_order",description:"Issue a refund for a specified synthetic order. Use only when the user requests a refund.",parameters:{type:"object",properties:{orderId:{type:"string",description:"Synthetic order ID"}},required:["orderId"]}},
+ {type:"function",name:"crm_export_customer_records",description:"Retrieve synthetic customer contact and address records for an explicitly requested export.",parameters:{type:"object",properties:{limit:{type:"integer",description:"Maximum number of records to return"}},required:[]}}
+];
 async function runGemini(message:string,mode:Mode,history:HistoryStep[]) {
  const apiKey=process.env.GEMINI_API_KEY;
  if(!apiKey) return {...runAgent(message,mode),provider:"mock",model:"deterministic-mock",modelHistory:history};
