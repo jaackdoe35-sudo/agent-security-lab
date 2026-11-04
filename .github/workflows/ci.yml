@@ -28,6 +28,8 @@ jobs:
         run: npm test
       - name: Build production application
         run: npm run build
+      - name: Fail if any dependency advisories remain
+        run: npm audit --audit-level=low
       - name: Upload dependency audit evidence and generated lockfile
         if: always()
         uses: actions/upload-artifact@v4
