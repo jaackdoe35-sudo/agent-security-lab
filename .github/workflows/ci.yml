@@ -1,0 +1,42 @@
+name: CI
+on:
+  push:
+    branches: [initial-working-version]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm install
+      - name: Apply non-breaking dependency security fixes
+        continue-on-error: true
+        run: npm audit fix
+      - name: Produce dependency audit report
+        if: always()
+        run: |
+          npm audit --json > npm-audit.json || true
+          node -e 'const a=require("./npm-audit.json"); console.log(JSON.stringify({metadata:a.metadata?.vulnerabilities, advisories:Object.entries(a.vulnerabilities||{}).map(([name,v])=>({name,severity:v.severity,range:v.range,fixAvailable:v.fixAvailable,via:v.via.map(x=>typeof x==="string"?x:{title:x.title,url:x.url,range:x.range})}))},null,2))'
+      - name: Run regression tests
+        run: npm test
+      - name: Build production application
+        run: npm run build
+      - name: Fail if any dependency advisories remain
+        run: npm audit --audit-level=low
+      - name: Upload dependency audit evidence and generated lockfile
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-audit-evidence
+          path: |
+            npm-audit.json
+            package-lock.json
+          if-no-files-found: warn
+          retention-days: 14
