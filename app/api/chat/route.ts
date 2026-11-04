@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { createHash } from "node:crypto";
+import { authorizeLabRequest, checkRateLimit } from "@/lib/access";
 import { runAgent, type Mode, type Event } from "@/lib/agent";
 import { executeTool, type ToolResult } from "@/lib/tools";
 export const runtime = "nodejs";
@@ -46,13 +48,18 @@ async function runGemini(message:string,mode:Mode,history:HistoryStep[]) {
 }
 
 export async function POST(request:Request){
+ const access = authorizeLabRequest(request.headers.get("authorization"));
+ if (!access.ok) return NextResponse.json({error:access.error},{status:access.status});
+ const clientKey = createHash("sha256").update(request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown").digest("hex");
+ const rate = checkRateLimit(clientKey);
+ if (!rate.ok) return NextResponse.json({error:rate.error},{status:rate.status});
  try{
   const body:unknown=await request.json();
   if(!body||typeof body!=="object")return NextResponse.json({error:"Invalid request."},{status:400});
   const {message,mode,history}=body as {message?:unknown;mode?:unknown;history?:unknown};
   if(typeof message!=="string"||!message.trim()||message.length>6000)return NextResponse.json({error:"Message must contain 1–6000 characters."},{status:400});
   const selectedMode:Mode=mode==="vulnerable"?"vulnerable":"hardened";
-  const safeHistory=Array.isArray(history)?history.slice(-40) as HistoryStep[]:[];
+  const safeHistory:HistoryStep[]=[];
   return NextResponse.json(await runGemini(message,selectedMode,safeHistory));
  }catch(error){return NextResponse.json({error:error instanceof Error?error.message:"Request failed."},{status:502});}
 }
