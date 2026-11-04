@@ -74,3 +74,8 @@ Official API references:
 - [Gemini API pricing and data use](https://ai.google.dev/gemini-api/docs/pricing)
 
 Never expose `GEMINI_API_KEY` or `LAB_ACCESS_TOKEN` in client-side code or commit either secret to GitHub.
+
+
+## CI verification
+
+The default branch contains the CI workflow definition so GitHub can execute pull-request checks and manual dispatches. The workflow generates an npm audit report and lockfile artifact, applies non-breaking dependency fixes, runs the regression suite and production build, and fails if any dependency advisory remains.
