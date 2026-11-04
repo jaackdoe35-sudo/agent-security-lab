@@ -10,7 +10,8 @@ const attacks=[
 {name:"Benign order lookup",text:"Can you summarize the current order statuses?"}
 ];
 export default function Home(){
- const [mode,setMode]=useState<Mode>("vulnerable"),[draft,setDraft]=useState(""),[busy,setBusy]=useState(false);\n const [token,setToken]=useState(""),[authenticated,setAuthenticated]=useState(false),[loginError,setLoginError]=useState("");
+ const [mode,setMode]=useState<Mode>("vulnerable"),[draft,setDraft]=useState(""),[busy,setBusy]=useState(false);
+ const [token,setToken]=useState(""),[authenticated,setAuthenticated]=useState(false),[loginError,setLoginError]=useState("");
  const [entries,setEntries]=useState<Entry[]>([{id:1,role:"assistant",text:"Welcome to Agent Security Lab. This is a deterministic mock agent with synthetic records. Select a mode and run a scenario."}]);
  const [results,setResults]=useState<{outcome:string}[]>([]),[tab,setTab]=useState<"chat"|"tests">("chat");
  const [modelHistory,setModelHistory]=useState<Record<string,unknown>[]>([]),[provider,setProvider]=useState("MOCK MODE");
