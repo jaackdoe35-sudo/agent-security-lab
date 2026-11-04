@@ -48,6 +48,8 @@ async function runGemini(message:string,mode:Mode,history:HistoryStep[]) {
 }
 
 export async function POST(request:Request){
+ const declaredLength = Number(request.headers.get("content-length") || 0);
+ if (declaredLength > 16_384) return NextResponse.json({error:"Request body exceeds 16 KB."},{status:413});
  const access = authorizeLabRequest(request.headers.get("authorization"));
  if (!access.ok) return NextResponse.json({error:access.error},{status:access.status});
  const clientKey = createHash("sha256").update(request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown").digest("hex");
