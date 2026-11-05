@@ -60,8 +60,15 @@ export async function POST(request:Request){
   if(!body||typeof body!=="object")return NextResponse.json({error:"Invalid request."},{status:400});
   const {message,mode,history}=body as {message?:unknown;mode?:unknown;history?:unknown};
   if(typeof message!=="string"||!message.trim()||message.length>6000)return NextResponse.json({error:"Message must contain 1–6000 characters."},{status:400});
+  if(history!==undefined&&!Array.isArray(history))return NextResponse.json({error:"Invalid conversation history."},{status:400});
+  const allowedStepTypes=new Set(["user_input","thought","model_output","function_call","function_result"]);
+  const suppliedHistory=Array.isArray(history)?history:[];
+  if(suppliedHistory.length>24||suppliedHistory.some((step)=>!step||typeof step!=="object"||Array.isArray(step)||typeof (step as Record<string,unknown>).type!=="string"||!allowedStepTypes.has((step as Record<string,string>).type)))return NextResponse.json({error:"Conversation history is invalid or too long. Switch security profile to reset the conversation."},{status:400});
+  if(Buffer.byteLength(JSON.stringify(suppliedHistory),"utf8")>10_000)return NextResponse.json({error:"Conversation history exceeds 10 KB. Switch security profile to reset the conversation."},{status:413});
   const selectedMode:Mode=mode==="vulnerable"?"vulnerable":"hardened";
-  const safeHistory:HistoryStep[]=[];
-  return NextResponse.json(await runGemini(message,selectedMode,safeHistory));
- }catch(error){return NextResponse.json({error:error instanceof Error?error.message:"Request failed."},{status:502});}
+  return NextResponse.json(await runGemini(message,selectedMode,suppliedHistory as HistoryStep[]));
+ }catch(error){
+  console.error("Agent Security Lab provider request failed",error instanceof Error?error.message:"unknown error");
+  return NextResponse.json({error:"The model request failed. Check the provider key, model access and deployment configuration."},{status:502});
+ }
 }
