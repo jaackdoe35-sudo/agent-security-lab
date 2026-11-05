@@ -40,7 +40,8 @@ async function runGemini(message:string,mode:Mode,history:HistoryStep[]) {
    const result=executeTool(name,args,mode);
    events.push(...result.events);
    if(result.outcome==="executed"||result.outcome==="blocked"){outcome=result.outcome;scenario=result.scenario;}
-   working.push({type:"function_result",name,call_id:String(call.id||""),result:[{type:"text",text:result.reply}]});
+   if(typeof call.id!=="string"||!call.id)throw new Error("Gemini returned a function call without an ID.");
+   working.push({type:"function_result",call_id:call.id,result:{reply:result.reply}});
   }
  }
  if(!finalText) finalText=outcome==="blocked"?"The requested privileged action was blocked by the application security control.":"The model did not return a final text response within the tool-call limit.";
