@@ -9,7 +9,7 @@
 - Removed the Gemini Interactions API adapter from `app/api/chat/route.ts`; the endpoint now invokes deterministic mock logic only.
 - Removed Gemini-specific UI state, provider messaging and environment-example entries.
 - Replaced the project documentation with a provider-neutral architecture.
-- Added a public anonymous free-model evaluation harness at `scripts/free-model-evaluation.mjs`.
+- Added a provider-neutral OpenAI-compatible free-model evaluation harness at `scripts/free-model-evaluation.mjs`; endpoint, model and optional bearer credential are configured with `LLM_BASE_URL`, `LLM_MODEL` and `LLM_API_KEY`. The default remains anonymous and keyless.
 - Added a seven-scenario execution report with observed model IDs, prompt profiles, synthetic tool outcomes and limitations.
 - The Vercel production project is under team `Tobe` and is separate from the main portfolio project.
 - Local sandbox verification on this branch: 13/13 tests passed; Next.js production build compiled, type-checked and generated all static pages successfully.
