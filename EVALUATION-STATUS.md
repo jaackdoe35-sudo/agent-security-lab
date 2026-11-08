@@ -7,7 +7,8 @@
 ## Verified changes
 
 - Access screen verifies bearer token server-side before opening the workbench.
-- Chat API enforces body-size limits after reading the body, rejects malformed JSON and invalid mode values.
+- Chat API enforces a 16 KB cap during streamed body reading, rejects malformed JSON and invalid mode values.
+- Access-verification attempts are rate-limited separately from chat requests using a best-effort per-instance counter; this is not distributed protection.
 - Exported evidence includes tool-call events rather than an empty toolCalls array.
 - Lab UI uses the portfolio's white, blue and editorial serif visual system.
 

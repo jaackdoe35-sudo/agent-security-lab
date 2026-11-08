@@ -15,7 +15,7 @@ The free-model evaluation was executed twice on 2026-11-08 through a public anon
 - No real refunds, emails, external accounts or production customer data are connected.
 - Vulnerable mode intentionally permits selected unsafe synthetic actions; hardened mode denies privileged actions at the simulated tool boundary.
 - The chat API fails closed unless `LAB_ACCESS_TOKEN` is configured and supplied as a bearer token.
-- API requests are limited to 16 KB and rate-limited per serverless process instance. This in-memory limiter is a prototype safeguard, not a distributed abuse-control system.
+- The chat API enforces a 16 KB body cap while reading the request stream, including requests without a trustworthy Content-Length. Chat and access-verification attempts have separate in-memory limits per serverless process instance. This is best-effort throttling, not a distributed abuse-control system.
 - Never add real credentials or connect production tools to vulnerable mode.
 
 ## Access control
