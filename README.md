@@ -4,7 +4,7 @@ A controlled sandbox for evaluating prompt injection, tool authorization and dat
 
 ## Architecture: provider-neutral
 
-The deployed workbench is deterministic mock logic only. It has no Gemini integration, no external LLM provider dependency and no provider API key. Live free-model evaluations are executed separately using the script in `scripts/free-model-evaluation.mjs`; their raw provider responses, exact prompts, model identifiers, request IDs, tool calls and simulated tool results are retained as evidence files under `evidence/`.
+The deployed workbench is deterministic mock logic only. It has no Gemini integration, no external LLM provider dependency and no provider API key. Live free-model evaluations are executed separately using the script in `scripts/free-model-evaluation.mjs`; the repository retains the evaluation report and reproduction harness. The original execution logs were captured in the Vercel sandbox session; the report summarizes the verified tool calls and outcomes.
 
 The initial free-model evaluation was executed on 2026-11-08 through a public anonymous inference gateway using `auto/free`. The gateway routed individual turns to NVIDIA Nemotron 3 Super 120B and MiniMax M3.1 Flash. Routing can change between requests. The harness sends no Authorization header and uses synthetic prompts and synthetic tools only. See [the evidence index](evidence/README.md).
 
