@@ -5,7 +5,8 @@
   "scripts": {
     "build": "npm test && next build",
     "dev": "next dev",
-    "test": "tsx --test tests/*.test.ts"
+    "test": "tsx --test tests/*.test.ts",
+    "evaluate:free": "node scripts/free-model-evaluation.mjs"
   },
   "dependencies": {
     "next": "15.5.29",
