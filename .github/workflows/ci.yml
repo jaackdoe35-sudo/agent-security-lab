@@ -26,6 +26,9 @@ jobs:
           node -e 'const a=require("./npm-audit.json"); console.log(JSON.stringify({metadata:a.metadata?.vulnerabilities, advisories:Object.entries(a.vulnerabilities||{}).map(([name,v])=>({name,severity:v.severity,range:v.range,fixAvailable:v.fixAvailable,via:v.via.map(x=>typeof x==="string"?x:{title:x.title,url:x.url,range:x.range})}))},null,2))'
       - name: Run regression tests
         run: npm test
+      - name: Verify production access-token configuration
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: node scripts/smoke-production-access.mjs
       - name: Build production application
         run: npm run build
       - name: Fail if any dependency advisories remain
