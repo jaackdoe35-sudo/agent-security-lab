@@ -1,7 +1,7 @@
 name: CI
 on:
   push:
-    branches: [initial-working-version]
+    branches: [main, initial-working-version, provider-neutral-free-llm]
   pull_request:
   workflow_dispatch:
 permissions:
