@@ -6,6 +6,11 @@
 
 ## Verified changes
 
+- Access screen verifies bearer token server-side before opening the workbench.
+- Chat API enforces body-size limits after reading the body, rejects malformed JSON and invalid mode values.
+- Exported evidence includes tool-call events rather than an empty toolCalls array.
+- Lab UI uses the portfolio's white, blue and editorial serif visual system.
+
 - Removed the Gemini Interactions API adapter from `app/api/chat/route.ts`; the endpoint now invokes deterministic mock logic only.
 - Removed Gemini-specific UI state, provider messaging and environment-example entries.
 - Replaced the project documentation with a provider-neutral architecture.
