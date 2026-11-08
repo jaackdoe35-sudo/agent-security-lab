@@ -36,7 +36,7 @@ Configure `LAB_ACCESS_TOKEN` as a random secret of at least 32 characters in Ver
 
 ## Live free-model evaluation
 
-The separate evaluation harness uses a public anonymous free-model gateway without an API key. It offers no SLA or guaranteed model identity; the exact returned model ID is recorded for each turn. Do not use it for confidential data. Tool calls are executed against local synthetic functions and never cause external business actions. The deployed app does not proxy user prompts to this service.
+The separate evaluation harness calls an OpenAI-compatible Chat Completions endpoint directly over HTTPS; it does not use a provider SDK or require a model-specific integration. Its default is a public anonymous free-model gateway without an API key. You can switch compatible free endpoints/models with `LLM_BASE_URL` and `LLM_MODEL`; `LLM_API_KEY` is optional for free providers that require a bearer credential. The harness records the returned model ID per turn. Not every public model or website exposes this API format or supports tool calls. Do not use it for confidential data. Tool calls execute only against local synthetic functions. The deployed app does not proxy user prompts to the provider.
 
 Run the harness with Node 22+:
 
