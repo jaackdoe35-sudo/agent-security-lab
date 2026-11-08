@@ -25,7 +25,10 @@ export async function POST(request: Request) {
   }
 
   try {
-    const body: unknown = await request.json();
+    const rawBody = await request.text();
+    if (new TextEncoder().encode(rawBody).byteLength > 16_384) return NextResponse.json({ error: "Request body exceeds 16 KB." }, { status: 413 });
+    let body: unknown;
+    try { body = JSON.parse(rawBody); } catch { return NextResponse.json({ error: "Malformed JSON request." }, { status: 400 }); }
     if (!body || typeof body !== "object" || Array.isArray(body)) {
       return NextResponse.json({ error: "Invalid request." }, { status: 400 });
     }
@@ -35,7 +38,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Message must contain 1–6000 characters." }, { status: 400 });
     }
 
-    const selectedMode: Mode = mode === "vulnerable" ? "vulnerable" : "hardened";
+    if (mode !== "vulnerable" && mode !== "hardened") return NextResponse.json({ error: "Mode must be vulnerable or hardened." }, { status: 400 });
+    const selectedMode: Mode = mode as Mode;
     const result = runAgent(message, selectedMode);
     const startedAt = new Date().toISOString();
     const evidence = {
@@ -52,7 +56,7 @@ export async function POST(request: Request) {
       outcome: result.outcome,
       reply: result.reply,
       events: result.events,
-      toolCalls: [],
+      toolCalls: result.events.filter((event) => event.type === "tool_call").map((event) => ({ message: event.message, allowed: event.allowed ?? false })),
       limitation: "This deployed workbench uses deterministic mock logic only. Live free-model evaluations are run separately with scripts/free-model-evaluation.mjs and are not routed through this API."
     };
 
