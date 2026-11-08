@@ -1,5 +1,7 @@
 # Agent Security Lab
 
+[Evaluation evidence status](EVALUATION-STATUS.md) — verified repository/CI evidence and explicit limits on live Gemini claims.
+
 A controlled sandbox for evaluating prompt injection, tool authorization and data-disclosure boundaries in an AI-agent-style chatbot.
 
 ## Status: 0.1.0 controlled prototype
