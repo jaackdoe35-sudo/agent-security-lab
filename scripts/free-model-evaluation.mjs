@@ -8,8 +8,11 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { randomUUID } from "node:crypto";
 
-const endpoint = "https://api.jarvisclaw.ai/v1/chat/completions";
-const requestedModel = "auto/free";
+const endpoint = process.env.LLM_BASE_URL?.trim() || "https://api.jarvisclaw.ai/v1/chat/completions";
+const requestedModel = process.env.LLM_MODEL?.trim() || "auto/free";
+const apiKey = process.env.LLM_API_KEY?.trim() || "";
+const requestHeaders = { "content-type": "application/json", ...(apiKey ? { authorization: "Bearer " + apiKey } : {}) };
+const credentialMode = apiKey ? "Bearer credential supplied through LLM_API_KEY; secret value is never recorded" : "No Authorization header; no API key or provider account configured";
 const tools = [
   { type: "function", function: { name: "shopify_get_orders", description: "Retrieve synthetic order records.", parameters: { type: "object", properties: { limit: { type: "integer" } }, required: [] } } },
   { type: "function", function: { name: "shopify_refund_order", description: "Issue a simulated refund for a synthetic order.", parameters: { type: "object", properties: { orderId: { type: "string" } }, required: ["orderId"] } } },
@@ -50,11 +53,11 @@ function simulateTool(name, args, profile) {
 const runs = [];
 for (const test of cases) {
   const messages = [{ role: "system", content: test.system }, { role: "user", content: test.user }];
-  const run = { id: test.id, profile: test.profile, scenario: test.scenario, system: test.system, user: test.user, provider: "anonymous public inference gateway", requestedModel, credentialMode: "No Authorization header; no API key; no provider account configured", startedAt: new Date().toISOString(), turns: [], toolExecutions: [], error: null };
+  const run = { id: test.id, profile: test.profile, scenario: test.scenario, system: test.system, user: test.user, provider: new URL(endpoint).host, requestedModel, credentialMode, startedAt: new Date().toISOString(), turns: [], toolExecutions: [], error: null };
   try {
     let final = false;
     for (let turn = 0; turn < 4; turn++) {
-      const response = await fetch(endpoint, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ model: requestedModel, messages, tools, tool_choice: "auto", temperature: 0, max_tokens: 700 }), signal: AbortSignal.timeout(90_000) });
+      const response = await fetch(endpoint, { method: "POST", headers: requestHeaders, body: JSON.stringify({ model: requestedModel, messages, tools, tool_choice: "auto", temperature: 0, max_tokens: 700 }), signal: AbortSignal.timeout(90_000) });
       const body = await response.json();
       if (!response.ok) throw new Error("HTTP " + response.status + ": " + JSON.stringify(body).slice(0, 500));
       const choice = body.choices?.[0];
@@ -94,7 +97,7 @@ const evidence = {
   executedAt: new Date().toISOString(),
   endpoint,
   requestedModel,
-  credentialMode: "No Authorization header, no API key, no provider account configured in test harness",
+  credentialMode,
   notice: "Synthetic prompts and tools only. The public inference provider may log requests. Tool actions are local simulations and never affect real systems.",
   runs
 };
