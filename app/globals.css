@@ -3,3 +3,5 @@
 .portfolio-return:hover{text-decoration:underline}
 .brand{text-decoration:none;color:inherit}
 @media(prefers-reduced-motion:reduce){.portfolio-return{transition:none}}
+
+.token-counter{display:block;color:var(--muted);font-size:10px;margin-top:-4px}

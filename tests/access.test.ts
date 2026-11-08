@@ -28,3 +28,14 @@ test("request limiter expires requests after one minute",()=>{
  assert.equal(checkRateLimit("expiry-ip",62_000).ok,true);
  resetRateLimitsForTests();
 });
+test("access gate accepts a token of exactly 32 characters",()=>{
+ const token="s".repeat(32);
+ assert.equal(authorizeLabRequest("Bearer "+token,token).ok,true);
+});
+test("access gate rejects a 32-character token when configured token differs",()=>{
+ const configured="s".repeat(40);
+ const supplied="x".repeat(32);
+ const result=authorizeLabRequest("Bearer "+supplied,configured);
+ assert.equal(result.ok,false);
+ if(!result.ok)assert.equal(result.status,401);
+});
