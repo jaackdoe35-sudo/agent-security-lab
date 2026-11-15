@@ -70,9 +70,12 @@ export function validatePurchaseInput(input: unknown): PurchaseValidationResult 
     return rejected("schema_rejected", errors, false);
   }
 
+  // The schema checks above establish these as positive safe integers.
+  const validatedCost = record.cost as number;
+
   // This $5 floor is a separate, model-reported business rule, not part of
   // the positive-integer schema constraint. It is configurable test-fixture data.
-  if (record.cost < REPORTED_MINIMUM_COST) {
+  if (validatedCost < REPORTED_MINIMUM_COST) {
     return rejected(
       "policy_rejected",
       [`cost must be at least ${REPORTED_MINIMUM_COST} under the reported business-price policy.`],
